@@ -1,32 +1,23 @@
-# {{.TEMPLATE}}
-[![{{.TEMPLATE}}](https://github.com/bytemare/{{.TEMPLATE}}/actions/workflows/ci.yml/badge.svg)](https://github.com/bytemare/{{.TEMPLATE}}/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/{{.TEMPLATE}}.svg)](https://pkg.go.dev/github.com/bytemare/{{.TEMPLATE}})
-[![codecov](https://codecov.io/gh/bytemare/{{.TEMPLATE}}/branch/main/graph/badge.svg?token=5bQfB0OctA)](https://codecov.io/gh/bytemare/{{.TEMPLATE}})
+# Cryptographic Hash Functions
+[![hash](https://github.com/bytemare/hash/actions/workflows/ci.yml/badge.svg)](https://github.com/bytemare/hash/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
+[![codecov](https://codecov.io/gh/bytemare/hash/branch/main/graph/badge.svg?token=5bQfB0OctA)](https://codecov.io/gh/bytemare/hash)
 
 ```
-  import "github.com/bytemare/{{.TEMPLATE}}"
+  import "github.com/bytemare/hash"
 ```
 
-This package implements [{{.TEMPLATE}}](https://datatracker.ietf.org/doc/draft-irtf-cfrg-{{.TEMPLATE}}).
+This package exposes a simple API to seamlessly use a variety of cryptographic functions. It aims at minimum code
+adaptation in your code, and easy parameterization. It completely relies on built-ins, so there's no change in
+implementations.
 
-{{Short description}}
+## Documentation [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
 
-This package is continuously fuzzed on Fuzzbuzz.
-
-#### What is {{.TEMPLATE}}?
-
-> {{Short Philosophy about the concept we're implementing.}}
-
-#### References
-- {{If you have any, put links that can help know more.}}
-
-## Documentation [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/{{.TEMPLATE}}.svg)](https://pkg.go.dev/github.com/bytemare/{{.TEMPLATE}})
-
-You can find the documentation and usage examples in [the package doc](https://pkg.go.dev/github.com/bytemare/{{.TEMPLATE}}) and [the project wiki](https://github.com/bytemare/{{.TEMPLATE}}/wiki) .
+You can find the documentation and usage examples in [the package doc](https://pkg.go.dev/github.com/bytemare/hash) and [the project wiki](https://github.com/bytemare/hash/wiki) .
 
 ## Versioning
 
-[SemVer](http://semver.org) is used for versioning. For the versions available, see the [tags on the repository](https://github.com/bytemare/{{.TEMPLATE}}/tags).
+[SemVer](http://semver.org) is used for versioning. For the versions available, see the [tags on the repository](https://github.com/bytemare/hash/tags).
 
 
 ## Contributing
