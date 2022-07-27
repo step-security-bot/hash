@@ -225,9 +225,9 @@ func (h *ExtendableHash) Write(p []byte) (n int, err error) {
 
 // Read returns size bytes from the current hash.
 func (h *ExtendableHash) Read(size int) []byte {
-	if size < h.minOutputSize {
-		panic(errSmallOutputSize)
-	}
+	//if size < h.minOutputSize {
+	//	panic(errSmallOutputSize)
+	//}
 
 	output := make([]byte, size)
 	_, _ = h.XOF.Read(output)
