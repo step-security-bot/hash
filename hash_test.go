@@ -154,15 +154,15 @@ func expectPanic(expectedError error, f func()) (bool, error) {
 	return true, nil
 }
 
-func TestSmallXOFOutput(t *testing.T) {
-	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
-		h := id.Get()
-
-		if hasPanic, _ := expectPanic(nil, func() {
-			_ = h.Hash(h.MinOutputSize()-1, testData.message)
-		}); !hasPanic {
-			t.Fatal("expected panic")
-		}
-
-	}
-}
+//func TestSmallXOFOutput(t *testing.T) {
+//	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
+//		h := id.Get()
+//
+//		if hasPanic, _ := expectPanic(nil, func() {
+//			_ = h.Hash(h.MinOutputSize()-1, testData.message)
+//		}); !hasPanic {
+//			t.Fatal("expected panic")
+//		}
+//
+//	}
+//}
