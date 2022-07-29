@@ -202,9 +202,11 @@ type ExtendableHash struct {
 
 // Hash returns the hash of the input argument with size output length.
 func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
+	/* This might be pulled in back later
 	if size < h.minOutputSize {
 		panic(errSmallOutputSize)
 	}
+	*/
 
 	h.Reset()
 
