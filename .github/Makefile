@@ -4,7 +4,6 @@ GH_ACTIONS = workflows
 update:
 	@echo "Updating dependencies..."
 	@$(shell cd ../ go get -u ../...)
-	@pwd
 	@go mod tidy
 	@echo "Updating Github Actions pins..."
 	@$(foreach file, $(wildcard $(GH_ACTIONS)/*.yml), pin-github-action $(file);)
@@ -16,7 +15,7 @@ update:
 fmt:
 	@echo "Formatting ..."
 	@go mod tidy
-	@go fmt ./...
+	@go fmt ../...
 	@golines -m 120 -t 4 -w .
 	@gofumpt -w -extra .
 	@gci write --Section Standard --Section Default --Section "Prefix($(shell go list -m))" ../
@@ -34,7 +33,7 @@ lint: license
 .PHONY: test
 test:
 	@echo "Running all tests ..."
-	@go test -v ../...
+	@go test -v -vet=all ../...
 
 .PHONY: cover
 cover:
