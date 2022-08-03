@@ -16,13 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089 # pin@master
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/golang@master
+        uses: snyk/actions/golang@7968f3f72b7f36280e6380b7c151c6a8d5a61dd0 # pin@master
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@2ca79b6fa8d3ec278944088b4aa5f46912db5d63 # pin@v2
         with:
           sarif_file: snyk.sarif
