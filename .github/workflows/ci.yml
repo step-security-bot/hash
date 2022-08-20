@@ -11,20 +11,15 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        GOVER: [ '1.18' ]
-
     steps:
       - name: Checkout repo
-        uses: actions/checkout@7884fcad6b5d53d10323aee724dc68d8b9096a2e # pin@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Go-${{ matrix.GOVER }}
-        uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # pin@v2
+      - name: Setup Go
+        uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.GOVER }}
+          go-version-file: ./go.mod
 
       # Linting
       - name: Linting
@@ -45,11 +40,11 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # pin@v2
         with:
-          go-version: '1.18'
+          go-version: '1.19'
 
       # Test
       - name: Run Tests
-        run: (cd .github/ && make test)
+        run: cd .github/ && make test
 
   analyze:
     name: Analyze
@@ -62,11 +57,11 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # pin@v2
         with:
-          go-version: '1.18'
+          go-version-file: ./go.mod
 
       # Coverage
       - name: Run coverage
-        run: (cd .github/ && make cover)
+        run: cd .github/ && make cover
 
       # Codecov
       - name: Codecov
