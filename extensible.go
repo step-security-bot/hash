@@ -9,6 +9,7 @@
 package hash
 
 import (
+	"errors"
 	"io"
 
 	"golang.org/x/crypto/blake2b"
@@ -115,12 +116,14 @@ func init() {
 	registeredXOF = make(map[Extendable]*xofParams)
 
 	SHAKE128.register(newShake(sha3.NewShake128, size256), shake128, blockSHAKE128, size256, sec128)
-	SHAKE256.register(newShake(sha3.NewShake256, size512), shake256, blockSHAKE256, size512, sec224)
+	// SHAKE256 would normally expect a minimum output size of 512 bits / 64 bytes, but hash to curve uses 256 / 32,
+	// which should be largely sufficient. Hence, we align the minimum output size to 256.
+	SHAKE256.register(newShake(sha3.NewShake256, size512), shake256, blockSHAKE256, size256, sec224)
 	BLAKE2XB.register(newBlake2xb(), blake2xb, 0, size256, sec128)
 	BLAKE2XS.register(newBlake2xs(), blake2xs, 0, size256, sec128)
 }
 
-// var errSmallOutputSize = errors.New("requested output size too small")
+var errSmallOutputSize = errors.New("requested output size too small")
 
 // XOF defines the interface to hash functions that
 // support arbitrary-length output.
@@ -201,11 +204,10 @@ type ExtendableHash struct {
 
 // Hash returns the hash of the input argument with size output length.
 func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
-	/* This might be pulled in back later
 	if size < h.minOutputSize {
 		panic(errSmallOutputSize)
 	}
-	*/
+
 	h.Reset()
 
 	for _, i := range input {
@@ -225,11 +227,10 @@ func (h *ExtendableHash) Write(p []byte) (n int, err error) {
 
 // Read returns size bytes from the current hash.
 func (h *ExtendableHash) Read(size int) []byte {
-	/* This might be pulled in back later
 	if size < h.minOutputSize {
 		panic(errSmallOutputSize)
 	}
-	*/
+
 	output := make([]byte, size)
 	_, _ = h.XOF.Read(output)
 

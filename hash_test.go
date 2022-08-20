@@ -12,6 +12,7 @@ import (
 	"crypto"
 	"errors"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/bytemare/hash"
@@ -85,23 +86,27 @@ func TestID(t *testing.T) {
 
 func TestHash(t *testing.T) {
 	for _, id := range []hash.Hashing{hash.SHA256, hash.SHA512, hash.SHA3_256, hash.SHA3_512} {
-		h := id.Get()
+		t.Run(strconv.Itoa(int(id)), func(t *testing.T) {
+			h := id.Get()
 
-		hh := h.Hash(testData.message)
+			hh := h.Hash(testData.message)
 
-		if len(hh) != h.OutputSize() {
-			t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, h.OutputSize(), len(hh))
-		}
+			if len(hh) != h.OutputSize() {
+				t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, h.OutputSize(), len(hh))
+			}
+		})
 	}
 
 	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
-		h := id.Get()
+		t.Run(string(id), func(t *testing.T) {
+			h := id.Get()
 
-		hh := h.Hash(h.MinOutputSize(), testData.message)
+			hh := h.Hash(h.MinOutputSize(), testData.message)
 
-		if len(hh) != h.MinOutputSize() {
-			t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, 32, len(hh))
-		}
+			if len(hh) != h.MinOutputSize() {
+				t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, 32, len(hh))
+			}
+		})
 	}
 }
 
@@ -154,15 +159,16 @@ func expectPanic(expectedError error, f func()) (bool, error) {
 	return true, nil
 }
 
-//func TestSmallXOFOutput(t *testing.T) {
-//	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
-//		h := id.Get()
-//
-//		if hasPanic, _ := expectPanic(nil, func() {
-//			_ = h.Hash(h.MinOutputSize()-1, testData.message)
-//		}); !hasPanic {
-//			t.Fatal("expected panic")
-//		}
-//
-//	}
-//}
+func TestSmallXOFOutput(t *testing.T) {
+	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
+		t.Run(string(id), func(t *testing.T) {
+			h := id.Get()
+
+			if hasPanic, _ := expectPanic(nil, func() {
+				_ = h.Hash(h.MinOutputSize()-1, testData.message)
+			}); !hasPanic {
+				t.Fatal("expected panic")
+			}
+		})
+	}
+}
