@@ -62,8 +62,8 @@ const (
 var errHmacKeySize = errors.New("hmac key length is larger than hash output size")
 
 type fixedParams struct {
-	parameters
 	newHashFunc func() hash.Hash
+	parameters
 }
 
 var registeredHashing map[Hashing]*fixedParams
@@ -137,7 +137,7 @@ func (i Hashing) String() string {
 	return registeredHashing[i].name
 }
 
-func (i Hashing) register(f func() hash.Hash, name string, blockSize, outputSize, security int) {
+func (i Hashing) register(hashFunc func() hash.Hash, name string, blockSize, outputSize, security int) {
 	registeredHashing[i] = &fixedParams{
 		parameters: parameters{
 			name:       name,
@@ -145,7 +145,7 @@ func (i Hashing) register(f func() hash.Hash, name string, blockSize, outputSize
 			outputSize: outputSize,
 			security:   security,
 		},
-		newHashFunc: f,
+		newHashFunc: hashFunc,
 	}
 }
 
@@ -162,13 +162,13 @@ func init() {
 
 // Hash offers easy an easy-to-use API for common cryptographic hash operations.
 type Hash struct {
-	Hashing
-	f    func() hash.Hash
 	hash hash.Hash
+	f    func() hash.Hash
+	Hashing
 }
 
 // Write implements io.Writer.
-func (h *Hash) Write(p []byte) (n int, err error) {
+func (h *Hash) Write(p []byte) (int, error) {
 	return h.hash.Write(p)
 }
 

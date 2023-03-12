@@ -47,8 +47,8 @@ const (
 )
 
 type xofParams struct {
-	parameters
 	newHashFunc newXOF
+	parameters
 }
 
 var registeredXOF map[Extendable]*xofParams
@@ -57,7 +57,6 @@ var registeredXOF map[Extendable]*xofParams
 func (e Extendable) Get() *ExtendableHash {
 	p := registeredXOF[e]
 	h := p.newHashFunc()
-	h.Extendable = e
 
 	return h
 }
@@ -98,7 +97,7 @@ func (e Extendable) String() string {
 	return registeredXOF[e].name
 }
 
-func (e Extendable) register(f newXOF, name string, blockSize, outputSize, security int) {
+func (e Extendable) register(hashFunc newXOF, name string, blockSize, outputSize, security int) {
 	registeredXOF[e] = &xofParams{
 		parameters: parameters{
 			name:       name,
@@ -106,7 +105,7 @@ func (e Extendable) register(f newXOF, name string, blockSize, outputSize, secur
 			outputSize: outputSize,
 			security:   security,
 		},
-		newHashFunc: f,
+		newHashFunc: hashFunc,
 	}
 }
 
@@ -115,10 +114,10 @@ type newXOF func() *ExtendableHash
 func init() {
 	registeredXOF = make(map[Extendable]*xofParams)
 
-	SHAKE128.register(newShake(sha3.NewShake128, size256), shake128, blockSHAKE128, size256, sec128)
+	SHAKE128.register(newShake(SHAKE128, sha3.NewShake128, size256), shake128, blockSHAKE128, size256, sec128)
 	// SHAKE256 would normally expect a minimum output size of 512 bits / 64 bytes, but hash to curve uses 256 / 32,
 	// which should be largely sufficient. Hence, we align the minimum output size to 256.
-	SHAKE256.register(newShake(sha3.NewShake256, size512), shake256, blockSHAKE256, size256, sec224)
+	SHAKE256.register(newShake(SHAKE256, sha3.NewShake256, size512), shake256, blockSHAKE256, size256, sec224)
 	BLAKE2XB.register(newBlake2xb(), blake2xb, 0, size256, sec128)
 	BLAKE2XS.register(newBlake2xs(), blake2xs, 0, size256, sec128)
 }
@@ -167,39 +166,51 @@ func (s shake) Clone() XOF {
 	return shake{s.ShakeHash.Clone()}
 }
 
-func newShake(f func() sha3.ShakeHash, minOutputSize int) newXOF {
+func newShake(id Extendable, f func() sha3.ShakeHash, minOutputSize int) newXOF {
 	return func() *ExtendableHash {
-		return &ExtendableHash{XOF: &shake{f()}, minOutputSize: minOutputSize}
+		return &ExtendableHash{
+			XOF:           &shake{f()},
+			minOutputSize: minOutputSize,
+			Extendable:    id,
+		}
 	}
 }
 
 func newBlake2xb() newXOF {
-	h, err := blake2b.NewXOF(blake2b.OutputLengthUnknown, nil)
+	xofFunc, err := blake2b.NewXOF(blake2b.OutputLengthUnknown, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	return func() *ExtendableHash {
-		return &ExtendableHash{XOF: &blake2bXOF{h}, minOutputSize: size256}
+		return &ExtendableHash{
+			XOF:           &blake2bXOF{xofFunc},
+			minOutputSize: size256,
+			Extendable:    BLAKE2XB,
+		}
 	}
 }
 
 func newBlake2xs() newXOF {
-	h, err := blake2s.NewXOF(blake2s.OutputLengthUnknown, nil)
+	xofFunc, err := blake2s.NewXOF(blake2s.OutputLengthUnknown, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	return func() *ExtendableHash {
-		return &ExtendableHash{XOF: &blake2sXOF{h}, minOutputSize: size256}
+		return &ExtendableHash{
+			XOF:           &blake2sXOF{xofFunc},
+			minOutputSize: size256,
+			Extendable:    BLAKE2XS,
+		}
 	}
 }
 
 // ExtendableHash wraps extendable output functions.
 type ExtendableHash struct {
-	Extendable
 	XOF
 	minOutputSize int
+	Extendable
 }
 
 // Hash returns the hash of the input argument with size output length.
@@ -221,7 +232,7 @@ func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
 }
 
 // Write implements io.Writer.
-func (h *ExtendableHash) Write(p []byte) (n int, err error) {
+func (h *ExtendableHash) Write(p []byte) (int, error) {
 	return h.XOF.Write(p)
 }
 

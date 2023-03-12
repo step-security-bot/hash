@@ -24,10 +24,10 @@ var (
 
 // parameters serves internal parameterization of the hash functions.
 type parameters struct {
+	name       string
 	blockSize  int
 	outputSize int
 	security   int
-	name       string
 }
 
 // Identifier exposes general information about hashing functions.
