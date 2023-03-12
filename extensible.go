@@ -46,8 +46,8 @@ const (
 )
 
 type xofParams struct {
-	parameters
 	newHashFunc newXOF
+	parameters
 }
 
 var registeredXOF map[Extendable]*xofParams
@@ -194,9 +194,9 @@ func newBlake2xs() newXOF {
 
 // ExtendableHash wraps extendable output functions.
 type ExtendableHash struct {
-	Extendable
 	XOF
 	minOutputSize int
+	Extendable
 }
 
 // Hash returns the hash of the input argument with size output length.
