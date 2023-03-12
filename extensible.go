@@ -9,7 +9,6 @@
 package hash
 
 import (
-	"errors"
 	"io"
 
 	"golang.org/x/crypto/blake2b"
@@ -122,7 +121,7 @@ func init() {
 	BLAKE2XS.register(newBlake2xs(), blake2xs, 0, size256, sec128)
 }
 
-var errSmallOutputSize = errors.New("requested output size too small")
+// var errSmallOutputSize = errors.New("requested output size too small")
 
 // XOF defines the interface to hash functions that
 // support arbitrary-length output.
@@ -215,10 +214,11 @@ type ExtendableHash struct {
 
 // Hash returns the hash of the input argument with size output length.
 func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
+	/* This might be pulled in back later
 	if size < h.minOutputSize {
 		panic(errSmallOutputSize)
 	}
-
+	*/
 	h.Reset()
 
 	for _, i := range input {
@@ -238,10 +238,11 @@ func (h *ExtendableHash) Write(p []byte) (int, error) {
 
 // Read returns size bytes from the current hash.
 func (h *ExtendableHash) Read(size int) []byte {
+	/* This might be pulled in back later
 	if size < h.minOutputSize {
 		panic(errSmallOutputSize)
 	}
-
+	*/
 	output := make([]byte, size)
 	_, _ = h.XOF.Read(output)
 
