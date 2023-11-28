@@ -1,6 +1,6 @@
 module github.com/bytemare/hash
 
-go 1.20
+go 1.21
 
 require golang.org/x/crypto v0.7.0
 
