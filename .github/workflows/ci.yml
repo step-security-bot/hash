@@ -69,7 +69,7 @@ jobs:
 
       # Codecov
       - name: Codecov
-        uses: codecov/codecov-action@29386c70ef20e286228c72b668a06fd0e8399192 # pin@master
+        uses: codecov/codecov-action@bbeaa140357942e4e8d8e15f1cd2f4e612f64c59 # pin@master
         with:
           file: .github/coverage.out
 
