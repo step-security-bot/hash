@@ -18,7 +18,7 @@ linters:
     - errname
     - errorlint
     - execinquery
-    # - exhaustive
+    #- exhaustive
     - exhaustruct
     - exportloopref
     - forbidigo
@@ -103,6 +103,8 @@ linters-settings:
   #  check-blank: true
   #  exclude-functions:
   #    - io.ReadFull
+  exhaustive:
+    ignore-enum-types: "hash.Hash"
   funlen:
     lines: 100
     statements: 50
