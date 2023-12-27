@@ -6,7 +6,7 @@
 // LICENSE file in the root directory of this source tree or at
 // https://spdx.org/licenses/MIT.html
 
-package hash_test
+package tests_test
 
 import (
 	"crypto"
@@ -89,8 +89,9 @@ func testAll(t *testing.T, f func(*testHash)) {
 }
 
 var (
-	errNoPanic        = errors.New("no panic")
-	errNoPanicMessage = errors.New("panic but no message")
+	errNoPanic          = errors.New("no panic")
+	errNoPanicMessage   = errors.New("panic but no message")
+	fmtExpectedEquality = "%s: expected equality"
 )
 
 func hasPanic(f func()) (has bool, err error) {

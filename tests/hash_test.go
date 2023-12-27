@@ -6,7 +6,7 @@
 // LICENSE file in the root directory of this source tree or at
 // https://spdx.org/licenses/MIT.html
 
-package hash_test
+package tests_test
 
 import (
 	"bytes"
@@ -39,7 +39,7 @@ var testData = &data{
 func TestID(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.HashID != h.HashID.New().Algorithm() {
-			t.Error("expected equality")
+			t.Error(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -63,7 +63,7 @@ func TestFromCrypto(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.HashType == hash.FixedOutputLength {
 			if hash.FromCrypto(h.cryptoID) != h.HashID {
-				t.Error("expected equality")
+				t.Error(fmtExpectedEquality, h.HashID)
 			}
 		}
 	})
@@ -76,7 +76,7 @@ func TestFromCrypto(t *testing.T) {
 func TestNames(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.name != h.HashID.String() {
-			t.Error("expected equality")
+			t.Error(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -84,7 +84,7 @@ func TestNames(t *testing.T) {
 func TestHashType(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.HashType != h.HashID.Type() {
-			t.Errorf("expected equality")
+			t.Errorf(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -115,7 +115,7 @@ func TestBlockSize(t *testing.T) {
 func TestOutputSize(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.outputsize != h.HashID.Size() || h.outputsize != h.HashID.New().Size() {
-			t.Errorf("expected equality")
+			t.Errorf(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -123,7 +123,7 @@ func TestOutputSize(t *testing.T) {
 func TestSecurityLevel(t *testing.T) {
 	testAll(t, func(h *testHash) {
 		if h.security != h.HashID.SecurityLevel() {
-			t.Errorf("expected equality")
+			t.Errorf(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -168,7 +168,7 @@ func TestHash(t *testing.T) {
 		hashed2 = h.HashID.Hash(testData.message)
 
 		if bytes.Compare(hashed1, hashed2) != 0 {
-			t.Error("expected equality")
+			t.Error(fmtExpectedEquality, h.HashID)
 		}
 
 		if len(hashed1) != h.HashID.Size() {
@@ -191,7 +191,7 @@ func TestSum(t *testing.T) {
 		hashed := hasher.Sum(nil)
 
 		if len(hashed) != hasher.Size() {
-			t.Error("expected equality")
+			t.Error(fmtExpectedEquality, h.HashID)
 		}
 	})
 }
@@ -209,11 +209,11 @@ func TestRead(t *testing.T) {
 		switch h.HashType {
 		case hash.FixedOutputLength:
 			if bytes.Compare(hashed1, hashed2) != 0 {
-				t.Errorf("%s: expected equality", h.HashID)
+				t.Errorf(fmtExpectedEquality, h.HashID)
 			}
 
 			if len(hashed1) != h.HashID.Size() {
-				t.Errorf("%s: expected equality", h.HashID)
+				t.Errorf(fmtExpectedEquality, h.HashID)
 			}
 		case hash.ExtendableOutputFunction:
 			if bytes.Compare(hashed1, hashed2) == 0 {
@@ -221,7 +221,7 @@ func TestRead(t *testing.T) {
 			}
 
 			if len(hashed1) != size {
-				t.Errorf("%s: expected equality", h.HashID)
+				t.Errorf(fmtExpectedEquality, h.HashID)
 			}
 		}
 	})
@@ -240,17 +240,3 @@ func TestReadXOFSmallSize(t *testing.T) {
 		}
 	})
 }
-
-//func TestSmallXOFOutput(t *testing.T) {
-//	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
-//		t.Run(string(id), func(t *testing.T) {
-//			h := id.New()
-//
-//			if hasPanic, _ := expectPanic(nil, func() {
-//				_ = h.Fixed(h.MinOutputSize()-1, testData.message)
-//			}); !hasPanic {
-//				t.Fatal("expected panic")
-//			}
-//		})
-//	}
-//}
