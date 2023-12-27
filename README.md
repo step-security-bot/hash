@@ -8,8 +8,12 @@
 ```
 
 This package exposes a simple API to seamlessly use a variety of cryptographic functions. It aims at minimum code
-adaptation in your code, and easy parameterization. It completely relies on built-ins, so there's no change in
-implementations.
+adaptation in your code, and easy parameterization. It completely relies on built-ins.
+
+It attempts to offer a single API for fixed and extensible-output functions,
+Merkle–Damgård construction (e.g. SHA-1, SHA-2), sponge functions (e.g. SHA-3, SHAKE), and HAIFA structures (e.g. Blake2).
+This API also provides useful metadata like block size, security, and output size when relevant.
+
 
 ## Documentation [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
 

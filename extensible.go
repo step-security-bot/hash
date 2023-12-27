@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (C) 2021 Daniel Bourdrez. All Rights Reserved.
+// Copyright (C) 2024 Daniel Bourdrez. All Rights Reserved.
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree or at
@@ -9,6 +9,7 @@
 package hash
 
 import (
+	"errors"
 	"io"
 
 	"golang.org/x/crypto/blake2b"
@@ -16,24 +17,7 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-// Extendable identifies Extendable-Output Functions.
-type Extendable byte
-
 const (
-	// SHAKE128 identifies the SHAKE128 Extendable-Output Function.
-	SHAKE128 Extendable = 1 + iota
-
-	// SHAKE256 identifies the SHAKE256 Extendable-Output Function.
-	SHAKE256
-
-	// BLAKE2XB identifies the BLAKE2XB Extendable-Output Function.
-	BLAKE2XB
-
-	// BLAKE2XS identifies the BLAKE2XS Extendable-Output Function.
-	BLAKE2XS
-
-	maxXOF
-
 	// string IDs for the hash functions.
 	shake128 = "SHAKE128"
 	shake256 = "SHAKE256"
@@ -45,87 +29,10 @@ const (
 	blockSHAKE256 = 1088 / 8
 )
 
-type xofParams struct {
-	newHashFunc newXOF
-	parameters
-}
+var errSmallOutputSize = errors.New("requested output size too small")
 
-var registeredXOF map[Extendable]*xofParams
-
-// Get returns a pointer to an initialized Hash structure for the according has primitive.
-func (e Extendable) Get() *ExtendableHash {
-	p := registeredXOF[e]
-	h := p.newHashFunc()
-
-	return h
-}
-
-// Available reports whether the given hash function is linked into the binary.
-func (e Extendable) Available() bool {
-	return e < maxXOF && registeredXOF[e] != nil
-}
-
-// BlockSize returns the hash's block size.
-func (e Extendable) BlockSize() int {
-	return registeredXOF[e].blockSize
-}
-
-// Extendable returns whether the hash function is extendable, therefore always true. This is only to comply to the
-// Identifier interface.
-func (e Extendable) Extendable() bool {
-	return true
-}
-
-// Hash returns the hash of the input arguments on the hash's secure minimum output length.
-func (e Extendable) Hash(input ...[]byte) []byte {
-	return e.Get().Hash(e.MinOutputSize(), input...)
-}
-
-// MinOutputSize returns the minimal output length necessary to guarantee its bit security level.
-func (e Extendable) MinOutputSize() int {
-	return e.Get().minOutputSize
-}
-
-// SecurityLevel returns the hash function's bit security level.
-func (e Extendable) SecurityLevel() int {
-	return registeredXOF[e].security
-}
-
-// String returns the hash function's common name.
-func (e Extendable) String() string {
-	return registeredXOF[e].name
-}
-
-func (e Extendable) register(hashFunc newXOF, name string, blockSize, outputSize, security int) {
-	registeredXOF[e] = &xofParams{
-		parameters: parameters{
-			name:       name,
-			blockSize:  blockSize,
-			outputSize: outputSize,
-			security:   security,
-		},
-		newHashFunc: hashFunc,
-	}
-}
-
-type newXOF func() *ExtendableHash
-
-func init() {
-	registeredXOF = make(map[Extendable]*xofParams)
-
-	SHAKE128.register(newShake(SHAKE128, sha3.NewShake128, size256), shake128, blockSHAKE128, size256, sec128)
-	// SHAKE256 would normally expect a minimum output size of 512 bits / 64 bytes, but hash to curve uses 256 / 32,
-	// which should be largely sufficient. Hence, we align the minimum output size to 256.
-	SHAKE256.register(newShake(SHAKE256, sha3.NewShake256, size512), shake256, blockSHAKE256, size256, sec224)
-	BLAKE2XB.register(newBlake2xb(), blake2xb, 0, size256, sec128)
-	BLAKE2XS.register(newBlake2xs(), blake2xs, 0, size256, sec128)
-}
-
-// var errSmallOutputSize = errors.New("requested output size too small")
-
-// XOF defines the interface to hash functions that
-// support arbitrary-length output.
-type XOF interface {
+// xof defines the interface to hash functions that support arbitrary-length output.
+type xof interface {
 	// Writer Write absorbs more data into the hash's state. It panics if called
 	// after Read.
 	io.Writer
@@ -134,127 +41,103 @@ type XOF interface {
 	// has been reached.
 	io.Reader
 
-	// Clone returns a copy of the XOF in its current state.
-	Clone() XOF
-
 	// Reset resets the XOF to its initial state.
 	Reset()
 }
 
-type blake2bXOF struct {
-	blake2b.XOF
-}
-
-func (b blake2bXOF) Clone() XOF {
-	return blake2bXOF{b.XOF.Clone()}
-}
-
-type blake2sXOF struct {
-	blake2s.XOF
-}
-
-func (b blake2sXOF) Clone() XOF {
-	return blake2sXOF{b.XOF.Clone()}
-}
-
-type shake struct {
-	sha3.ShakeHash
-}
-
-func (s shake) Clone() XOF {
-	return shake{s.ShakeHash.Clone()}
-}
-
-func newShake(id Extendable, f func() sha3.ShakeHash, minOutputSize int) newXOF {
-	return func() *ExtendableHash {
-		return &ExtendableHash{
-			XOF:           &shake{f()},
-			minOutputSize: minOutputSize,
-			Extendable:    id,
+func newXOF(hid Hash) newHash {
+	return func() Hasher {
+		ext := &ExtendableHash{
+			xof: nil,
+			id:  hid,
 		}
-	}
-}
 
-func newBlake2xb() newXOF {
-	xofFunc, err := blake2b.NewXOF(blake2b.OutputLengthUnknown, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	return func() *ExtendableHash {
-		return &ExtendableHash{
-			XOF:           &blake2bXOF{xofFunc},
-			minOutputSize: size256,
-			Extendable:    BLAKE2XB,
+		switch hid {
+		case SHAKE128:
+			ext.xof = sha3.NewShake128()
+		case SHAKE256:
+			ext.xof = sha3.NewShake256()
+		case BLAKE2XB:
+			ext.xof, _ = blake2b.NewXOF(blake2b.OutputLengthUnknown, nil)
+		case BLAKE2XS:
+			ext.xof, _ = blake2s.NewXOF(blake2s.OutputLengthUnknown, nil)
 		}
+
+		return ext
 	}
 }
 
-func newBlake2xs() newXOF {
-	xofFunc, err := blake2s.NewXOF(blake2s.OutputLengthUnknown, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	return func() *ExtendableHash {
-		return &ExtendableHash{
-			XOF:           &blake2sXOF{xofFunc},
-			minOutputSize: size256,
-			Extendable:    BLAKE2XS,
-		}
-	}
-}
-
-// ExtendableHash wraps extendable output functions.
+// ExtendableHash offers easy an easy-to-use API for common
+// cryptographic hash operations of extendable output functions.
 type ExtendableHash struct {
-	XOF
-	minOutputSize int
-	Extendable
+	xof
+	id Hash
+}
+
+// Algorithm returns the Hash function identifier.
+func (h *ExtendableHash) Algorithm() Hash {
+	return h.id
 }
 
 // Hash returns the hash of the input argument with size output length.
 func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
-	/* This might be pulled in back later
-	if size < h.minOutputSize {
-		panic(errSmallOutputSize)
-	}
-	*/
 	h.Reset()
 
 	for _, i := range input {
 		_, _ = h.Write(i)
 	}
 
+	return h.Read(size)
+}
+
+// Read consumes and returns size bytes from the current hash.
+func (h *ExtendableHash) Read(size int) []byte {
+	// This might be pulled in back later
+	if size < h.Size() {
+		panic(errSmallOutputSize)
+	}
+
 	output := make([]byte, size)
-	_, _ = h.XOF.Read(output)
+	_, _ = h.xof.Read(output)
 
 	return output
 }
 
 // Write implements io.Writer.
-func (h *ExtendableHash) Write(p []byte) (int, error) {
-	return h.XOF.Write(p)
+func (h *ExtendableHash) Write(input []byte) (int, error) {
+	return h.xof.Write(input)
 }
 
-// Read returns size bytes from the current hash.
-func (h *ExtendableHash) Read(size int) []byte {
-	/* This might be pulled in back later
-	if size < h.minOutputSize {
-		panic(errSmallOutputSize)
-	}
-	*/
-	output := make([]byte, size)
-	_, _ = h.XOF.Read(output)
+// Sum appends the current hash to b and returns the resulting slice.
+func (h *ExtendableHash) Sum(prefix []byte) []byte {
+	output := make([]byte, h.id.Size()+len(prefix))
+	copy(output, prefix)
+	_, _ = h.xof.Read(output[len(prefix):])
 
 	return output
 }
 
-// Reset resets the Hash to its initial state.
+// Reset resets the hash to its initial state.
 func (h *ExtendableHash) Reset() {
-	h.XOF.Reset()
+	h.xof.Reset()
 }
 
-// MinOutputSize returns the minimum output size for SHAKE functions to keep their collision resistance security.
-func (h *ExtendableHash) MinOutputSize() int {
-	return h.minOutputSize
+// Size returns the number of bytes Hash will return.
+func (h *ExtendableHash) Size() int {
+	return h.id.Size()
+}
+
+// BlockSize returns the hash's underlying block size.
+func (h *ExtendableHash) BlockSize() int {
+	return h.id.BlockSize()
+}
+
+// GetHashFunction returns nil.
+func (h *ExtendableHash) GetHashFunction() *Fixed {
+	return nil
+}
+
+// GetXOF returns the underlying ExtendableHash Hasher.
+func (h *ExtendableHash) GetXOF() *ExtendableHash {
+	return h
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (C) 2021 Daniel Bourdrez. All Rights Reserved.
+// Copyright (C) 2024 Daniel Bourdrez. All Rights Reserved.
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree or at
@@ -9,10 +9,9 @@
 package hash_test
 
 import (
+	"bytes"
 	"crypto"
 	"errors"
-	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/bytemare/hash"
@@ -37,135 +36,218 @@ var testData = &data{
 	info: []byte("contextInfo"),
 }
 
-func TestAvailability(t *testing.T) {
-	for _, id := range []hash.Hashing{hash.SHA256, hash.SHA512, hash.SHA3_256, hash.SHA3_512} {
-		if !id.Available() {
-			t.Errorf("%v is not available, but should be", id)
+func TestID(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.HashID != h.HashID.New().Algorithm() {
+			t.Error("expected equality")
 		}
-	}
+	})
+}
 
-	wrong := hash.Hashing(crypto.MD4)
+func TestAvailability(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if !h.HashID.Available() {
+			t.Errorf("%v is not available, but should be", h.HashID)
+		}
+	})
+}
+
+func TestNonAvailability(t *testing.T) {
+	wrong := hash.Hash(crypto.MD4)
 	if wrong.Available() {
 		t.Errorf("%v is considered available when it should not", wrong)
 	}
 }
 
-func TestID(t *testing.T) {
-	ids := []struct {
-		hash.Hashing
-		crypto.Hash
-	}{
-		{
-			hash.SHA256,
-			crypto.SHA256,
-		},
-		{
-			hash.SHA512,
-			crypto.SHA512,
-		},
-		{
-			hash.SHA3_256,
-			crypto.SHA3_256,
-		},
-		{
-			hash.SHA3_512,
-			crypto.SHA3_512,
-		},
-	}
-
-	for _, id := range ids {
-		if id.Hash != id.Hashing.GetCryptoID() {
-			t.Fatalf("GetCryptoID match error: %q vs. %q", id.Hash, id.Hashing.GetCryptoID())
+func TestFromCrypto(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.HashType == hash.FixedOutputLength {
+			if hash.FromCrypto(h.cryptoID) != h.HashID {
+				t.Error("expected equality")
+			}
 		}
+	})
 
-		if id.Hashing != hash.FromCrypto(id.Hash) {
-			t.Fatalf("FromCrypto matching error: %q vs. %q", id.Hashing, hash.FromCrypto(id.Hash))
+	if hash.FromCrypto(crypto.MD4) != 0 {
+		t.Error("expected 0")
+	}
+}
+
+func TestNames(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.name != h.HashID.String() {
+			t.Error("expected equality")
+		}
+	})
+}
+
+func TestHashType(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.HashType != h.HashID.Type() {
+			t.Errorf("expected equality")
+		}
+	})
+}
+
+func TestNoHashType(t *testing.T) {
+	values := []hash.Hash{0, 20, 25, 50}
+	for _, wrongID := range values {
+		if wrongID.Type() != "" {
+			t.Error("expected empty string")
 		}
 	}
+}
+
+func TestBlockSize(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.blocksize != h.HashID.New().BlockSize() {
+			t.Errorf(
+				"expected equality: %d:%d / %d:%d / ",
+				h.HashID,
+				h.blocksize,
+				h.HashID.New().Algorithm(),
+				h.HashID.New().BlockSize(),
+			)
+		}
+	})
+}
+
+func TestOutputSize(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.outputsize != h.HashID.Size() || h.outputsize != h.HashID.New().Size() {
+			t.Errorf("expected equality")
+		}
+	})
+}
+
+func TestSecurityLevel(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.security != h.HashID.SecurityLevel() {
+			t.Errorf("expected equality")
+		}
+	})
+}
+
+func TestHashFunctions(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		switch h.HashType {
+		case hash.FixedOutputLength:
+			if f := h.HashID.GetHashFunction(); f == nil {
+				t.Errorf("expected pointer to be non-nil")
+			}
+
+			if f := h.HashID.GetXOF(); f != nil {
+				t.Errorf("expected pointer to be nil")
+			}
+		case hash.ExtendableOutputFunction:
+			if f := h.HashID.GetHashFunction(); f != nil {
+				t.Errorf("expected pointer to be nil")
+			}
+
+			if f := h.HashID.GetXOF(); f == nil {
+				t.Errorf("expected pointer to be non-nil")
+			}
+		default:
+			panic(nil)
+		}
+	})
 }
 
 func TestHash(t *testing.T) {
-	for _, id := range []hash.Hashing{hash.SHA256, hash.SHA512, hash.SHA3_256, hash.SHA3_512} {
-		t.Run(strconv.Itoa(int(id)), func(t *testing.T) {
-			h := id.Get()
+	testAll(t, func(h *testHash) {
+		hasher := h.HashID.New()
+		var hashed1, hashed2 []byte
 
-			hh := h.Hash(testData.message)
+		switch h.HashType {
+		case hash.FixedOutputLength:
+			hashed1 = hasher.Hash(0, testData.message)
+		case hash.ExtendableOutputFunction:
+			hashed1 = hasher.Hash(hasher.Size(), testData.message)
+		}
 
-			if len(hh) != h.OutputSize() {
-				t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, h.OutputSize(), len(hh))
-			}
-		})
-	}
+		hashed2 = h.HashID.Hash(testData.message)
 
-	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
-		t.Run(string(id), func(t *testing.T) {
-			h := id.Get()
+		if bytes.Compare(hashed1, hashed2) != 0 {
+			t.Error("expected equality")
+		}
 
-			hh := h.Hash(h.MinOutputSize(), testData.message)
-
-			if len(hh) != h.MinOutputSize() {
-				t.Errorf("#%v : invalid hash output length length. Expected %d, got %d", id, 32, len(hh))
-			}
-		})
-	}
+		if len(hashed1) != h.HashID.Size() {
+			t.Errorf(
+				"%v : invalid hash output length length. Expected %d, got %d",
+				h.HashID,
+				h.HashID.Size(),
+				len(hashed1),
+			)
+		}
+	})
 }
 
-var (
-	errNoPanic        = errors.New("no panic")
-	errNoPanicMessage = errors.New("panic but no message")
-)
+func TestSum(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		hasher := h.HashID.New()
 
-func hasPanic(f func()) (has bool, err error) {
-	err = nil
-	var report interface{}
-	func() {
-		defer func() {
-			if report = recover(); report != nil {
-				has = true
-			}
-		}()
+		_, _ = hasher.Write(testData.message)
+		_, _ = hasher.Write(testData.salt)
+		hashed := hasher.Sum(nil)
 
-		f()
-	}()
-
-	if has {
-		err = fmt.Errorf("%v", report)
-	}
-
-	return has, err
+		if len(hashed) != hasher.Size() {
+			t.Error("expected equality")
+		}
+	})
 }
 
-// expectPanic executes the function f with the expectation to recover from a panic. If no panic occurred or if the
-// panic message is not the one expected, ExpectPanic returns (false, error).
-func expectPanic(expectedError error, f func()) (bool, error) {
-	hasPanic, err := hasPanic(f)
+func TestRead(t *testing.T) {
+	size := 100
+	testAll(t, func(h *testHash) {
+		hasher := h.HashID.New()
 
-	if !hasPanic {
-		return false, errNoPanic
-	}
+		_, _ = hasher.Write(testData.message)
+		_, _ = hasher.Write(testData.salt)
+		hashed1 := hasher.Read(size)
+		hashed2 := hasher.Read(size)
 
-	if expectedError == nil {
-		return true, nil
-	}
+		switch h.HashType {
+		case hash.FixedOutputLength:
+			if bytes.Compare(hashed1, hashed2) != 0 {
+				t.Errorf("%s: expected equality", h.HashID)
+			}
 
-	if err == nil {
-		return false, errNoPanicMessage
-	}
+			if len(hashed1) != h.HashID.Size() {
+				t.Errorf("%s: expected equality", h.HashID)
+			}
+		case hash.ExtendableOutputFunction:
+			if bytes.Compare(hashed1, hashed2) == 0 {
+				t.Errorf("%s: unexpected equality", h.HashID)
+			}
 
-	if err.Error() != expectedError.Error() {
-		return false, fmt.Errorf("expected %q, got: %w", expectedError, err)
-	}
+			if len(hashed1) != size {
+				t.Errorf("%s: expected equality", h.HashID)
+			}
+		}
+	})
+}
 
-	return true, nil
+func TestReadXOFSmallSize(t *testing.T) {
+	testAll(t, func(h *testHash) {
+		if h.HashType == hash.ExtendableOutputFunction {
+			hasher := h.HashID.New()
+
+			if panics, err := expectPanic(errors.New("requested output size too small"), func() {
+				_ = hasher.Read(1)
+			}); !panics {
+				t.Errorf("expected panic: %v", err)
+			}
+		}
+	})
 }
 
 //func TestSmallXOFOutput(t *testing.T) {
 //	for _, id := range []hash.Extendable{hash.SHAKE128, hash.SHAKE256, hash.BLAKE2XB, hash.BLAKE2XS} {
 //		t.Run(string(id), func(t *testing.T) {
-//			h := id.Get()
+//			h := id.New()
 //
 //			if hasPanic, _ := expectPanic(nil, func() {
-//				_ = h.Hash(h.MinOutputSize()-1, testData.message)
+//				_ = h.Fixed(h.MinOutputSize()-1, testData.message)
 //			}); !hasPanic {
 //				t.Fatal("expected panic")
 //			}
