@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089 # pin@master
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/golang@3e2680e8df93a24b52d119b1305fb7cedc60ceae # pin@master
+        uses: snyk/actions/golang@8349f9043a8b7f0f3ee8885bf28f0b388d2446e8 # pin@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
