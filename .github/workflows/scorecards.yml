@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@27135e314dd1818f797af1db9dae03a9f045786b # pin@master
+        uses: actions/checkout@cd7d8d697e10461458bc61a30d094dc601a8b017 # pin@master
         with:
           persist-credentials: false
 
       - name: "Run analysis"
-        uses: ossf/scorecard-action@342acf350cd07e41a36da9be2b107614dd1661a3 # pin@master
+        uses: ossf/scorecard-action@5fc43dc5154fb0ce7cc74b6264142ac8621bda1d # pin@master
         with:
           results_file: results.sarif
           results_format: sarif
@@ -42,7 +42,7 @@ jobs:
 
       # Upload the results as artifacts (optional).
       - name: "Upload artifact"
-        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # pin@master
+        uses: actions/upload-artifact@ef09cdac3e2d3e60d8ccadda691f4f1cec5035cb # pin@master
         with:
           name: SARIF file
           path: results.sarif
@@ -50,6 +50,6 @@ jobs:
 
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@5f532563584d71fdef14ee64d17bafb34f751ce5 # pin@master
+        uses: github/codeql-action/upload-sarif@09d4101d2b9ab56005e4d4b429fcd66b33f86488 # pin@master
         with:
           sarif_file: results.sarif
