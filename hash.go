@@ -72,7 +72,7 @@ func (h Hash) Available() bool {
 
 // Hash returns the hash of the concatenated input.
 func (h Hash) Hash(input ...[]byte) []byte {
-	return h.New().Hash(h.Size(), input...)
+	return h.New().Hash(uint(h.Size()), input...)
 }
 
 // New returns the underlying Hasher function.
@@ -128,7 +128,7 @@ type Hasher interface {
 
 	// Hash hashes the concatenation of input and returns size bytes. The size is ignored for fixed output length hashes
 	// as their output size is standard.
-	Hash(size int, input ...[]byte) []byte
+	Hash(size uint, input ...[]byte) []byte
 
 	// Read returns size bytes from the current hash.
 	// The underlying hash state is not modified for Merkle–Damgård constructions, and size bytes will be consumed

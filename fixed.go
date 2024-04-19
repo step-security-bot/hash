@@ -69,7 +69,7 @@ func (h *Fixed) Algorithm() Hash {
 }
 
 // Hash hashes the concatenation of input and returns size bytes. The size is ignored as the output size is standard.
-func (h *Fixed) Hash(_ int, input ...[]byte) []byte {
+func (h *Fixed) Hash(_ uint, input ...[]byte) []byte {
 	h.Reset()
 
 	for _, i := range input {

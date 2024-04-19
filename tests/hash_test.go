@@ -162,7 +162,7 @@ func TestHash(t *testing.T) {
 		case hash.FixedOutputLength:
 			hashed1 = hasher.Hash(0, testData.message)
 		case hash.ExtendableOutputFunction:
-			hashed1 = hasher.Hash(hasher.Size(), testData.message)
+			hashed1 = hasher.Hash(uint(hasher.Size()), testData.message)
 		}
 
 		hashed2 = h.HashID.Hash(testData.message)
