@@ -20,9 +20,13 @@ jobs:
       - uses: step-security/harden-runner@6c3b1c91e8873ae0c705b0709f957c7a6a5eaf10 # pin@main
         with:
           disable-sudo: true
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.snyk.io:443
+            github.com:443
+            proxy.golang.org:443
 
-      - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089 # pin@master
+      - uses: actions/checkout@v4 # pin@v4
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@8349f9043a8b7f0f3ee8885bf28f0b388d2446e8 # pin@master
         env:
