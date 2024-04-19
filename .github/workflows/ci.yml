@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Go
-        uses: actions/actions/setup-go@v4 # pin@v5
+        uses: actions/setup-go@v4 # pin@v5
         with:
           go-version-file: ./go.mod
 
@@ -63,7 +63,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Go
-        uses: actions/actions/setup-go@v4 # pin@v5
+        uses: actions/setup-go@v4 # pin@v5
         with:
           go-version: ${{ matrix.go }}
 
@@ -95,7 +95,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Go
-        uses: actions/actions/setup-go@v4 # pin@v5
+        uses: actions/setup-go@v4 # pin@v5
         with:
           go-version-file: ./go.mod
 
