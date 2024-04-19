@@ -80,14 +80,14 @@ func (h *ExtendableHash) Algorithm() Hash {
 }
 
 // Hash returns the hash of the input argument with size output length.
-func (h *ExtendableHash) Hash(size int, input ...[]byte) []byte {
+func (h *ExtendableHash) Hash(size uint, input ...[]byte) []byte {
 	h.Reset()
 
 	for _, i := range input {
 		_, _ = h.Write(i)
 	}
 
-	return h.Read(size)
+	return h.Read(int(size))
 }
 
 // Read consumes and returns size bytes from the current hash.

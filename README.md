@@ -2,6 +2,9 @@
 [![hash](https://github.com/bytemare/hash/actions/workflows/ci.yml/badge.svg)](https://github.com/bytemare/hash/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
 [![codecov](https://codecov.io/gh/bytemare/hash/branch/main/graph/badge.svg?token=5bQfB0OctA)](https://codecov.io/gh/bytemare/hash)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8781/badge)](https://www.bestpractices.dev/projects/8781)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bytemare/hash/badge)](https://securityscorecards.dev/viewer/?uri=github.com/bytemare/hash)
+
 
 ```
   import "github.com/bytemare/hash"
