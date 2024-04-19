@@ -26,7 +26,7 @@ jobs:
             github.com:443
             proxy.golang.org:443
 
-      - uses: actions/checkout@v4 # pin@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@8349f9043a8b7f0f3ee8885bf28f0b388d2446e8 # pin@master
         env:

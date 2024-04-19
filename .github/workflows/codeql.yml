@@ -31,16 +31,16 @@ jobs:
             api.github.com:443 github.com:443 proxy.golang.org:443 storage.googleapis.com:443 sum.golang.org:443
 
       - name: Checkout repository
-        uses: actions/checkout@v4 # pin@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3 # pin@v3
+        uses: github/codeql-action/init@c7f9125735019aa87cfc361530512d50ea439c71 # v3.25.1
         with:
           languages: go
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3 # pin@v3
+        uses: github/codeql-action/autobuild@c7f9125735019aa87cfc361530512d50ea439c71 # v3.25.1
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3 # pin@v3
+        uses: github/codeql-action/analyze@c7f9125735019aa87cfc361530512d50ea439c71 # v3.25.1
