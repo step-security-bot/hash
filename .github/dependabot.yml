@@ -13,8 +13,3 @@ updates:
       - "bytemare"
     reviewers:
       - "bytemare"
-
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
