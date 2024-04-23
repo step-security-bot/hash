@@ -61,7 +61,7 @@ jobs:
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"
-        uses: actions/upload-artifact@b06cde36fc32a3ee94080e87258567f73f921537
+        uses: actions/upload-artifact@79616d2ded92999fceefea2ca2e4bdf6101fa919
         with:
           name: SARIF file
           path: results.sarif
@@ -69,6 +69,6 @@ jobs:
 
       # required for Code scanning alerts
       - name: "Upload SARIF results to code scanning"
-        uses: github/codeql-action/upload-sarif@f45390cde1f1ce2bb4bbf6abf923ec4a4402bf0d
+        uses: github/codeql-action/upload-sarif@4909c1ffb99e09a99e1b55cb1ff576ea03aef64d
         with:
           sarif_file: results.sarif
