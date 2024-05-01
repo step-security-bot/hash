@@ -9,6 +9,6 @@ on:
 
 jobs:
   codeql:
-    uses: bytemare/actions/.github/workflows/codeql.yml
+    uses: bytemare/actions/.github/workflows/codeql.yml@main
     with:
       language: go
