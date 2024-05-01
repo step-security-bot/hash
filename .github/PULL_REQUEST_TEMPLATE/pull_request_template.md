@@ -9,7 +9,7 @@
 <!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
 <!--- Please link to the issue here: -->
 <!--- Put `closes #XXXX` in your comment to auto-close the issue that your PR fixes (if such). -->
-<!-- You can skip this if you're fixing a typo or adding an app to the Showcase. -->
+<!--- You can skip this if you're fixing a typo or adding an app to the Showcase. -->
 
 ### Motivation and Context
 <!--- Why is this change required? What problem does it solve? -->

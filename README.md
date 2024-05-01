@@ -15,8 +15,10 @@ adaptation in your code, and easy parameterization. It completely relies on buil
 
 It attempts to offer a single API for fixed and extensible-output functions,
 Merkle–Damgård construction (e.g. SHA-1, SHA-2), sponge functions (e.g. SHA-3, SHAKE), and HAIFA structures (e.g. Blake2).
-This API also provides useful metadata like block size, security, and output size when relevant.
 
+- Implements the hash.Hash interface
+- HMAC and HKDF for fixed output size hash functions
+- useful metadata like block size, security, and output size when relevant.
 
 ## Documentation [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
 
