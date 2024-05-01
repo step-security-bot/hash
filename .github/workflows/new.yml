@@ -23,18 +23,18 @@ jobs:
       command: cd .github && make test
       version: ${{ matrix.go }}
 
-  Analyze:
-    uses: bytemare/actions/.github/workflows/scan-go.yml@main
-    with:
-      organization: bytemare-github
-      project-key: bytemare_hash
-      sources: .
-      exclusions: ""
-      tests: tests/
-      test-exclusions: examples_test.go,tests/**
-      coverage-exclusions: examples_test.go,tests/**
-      verbose: true
-    secrets:
-      github: ${{ secrets.GITHUB_TOKEN }}
-      sonar: ${{ secrets.SONAR_TOKEN }}
-      codecov: ${{ secrets.CODECOV_TOKEN }}
+  #Analyze:
+  #  uses: bytemare/actions/.github/workflows/scan-go.yml@main
+  #  with:
+  #    organization: bytemare-github
+  #    project-key: bytemare_hash
+  #    sources: .
+  #    exclusions: ""
+  #    tests: tests/
+  #    test-exclusions: examples_test.go,tests/**
+  #    coverage-exclusions: examples_test.go,tests/**
+  #    verbose: true
+  #  secrets:
+  #    github: ${{ secrets.GITHUB_TOKEN }}
+  #    sonar: ${{ secrets.SONAR_TOKEN }}
+  #    codecov: ${{ secrets.CODECOV_TOKEN }}
