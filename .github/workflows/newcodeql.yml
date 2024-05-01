@@ -1,0 +1,14 @@
+name: "CodeQL"
+
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '31 10 * * 0'
+
+jobs:
+  codeql:
+    uses: bytemare/actions/.github/workflows/codeql.yml
+    with:
+      language: go
