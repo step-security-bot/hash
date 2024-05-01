@@ -1,4 +1,4 @@
-name: Do Stuff
+name: Hash
 
 on:
   pull_request:
