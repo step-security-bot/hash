@@ -1,5 +1,5 @@
 # Cryptographic Hash Functions
-[![hash](https://github.com/bytemare/hash/actions/workflows/ci.yml/badge.svg)](https://github.com/bytemare/hash/actions/workflows/ci.yml)
+[![hash](https://github.com/bytemare/hash/actions/.github/workflows/ci.yml/badge.svg)](https://github.com/bytemare/hash/actions/.github/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/bytemare/hash.svg)](https://pkg.go.dev/github.com/bytemare/hash)
 [![codecov](https://codecov.io/gh/bytemare/hash/branch/main/graph/badge.svg?token=5bQfB0OctA)](https://codecov.io/gh/bytemare/hash)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8781/badge)](https://www.bestpractices.dev/projects/8781)

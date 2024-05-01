@@ -8,7 +8,7 @@ on:
 jobs:
 
   Lint:
-    uses: bytemare/actions/workflows/golangci-lint.yml@main
+    uses: bytemare/actions/.github/workflows/golangci-lint.yml@main
     with:
       config-path: ./.github/.golangci.yml
       scope: ./...
@@ -18,13 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         go: [ '1.22', '1.21' ]
-    uses: bytemare/actions/workflows/test-go.yml@main
+    uses: bytemare/actions/.github/workflows/test-go.yml@main
     with:
       command: cd .github && make test
       version: ${{ matrix.go }}
 
   Analyze:
-    uses: bytemare/actions/workflows/scan-go.yml@main
+    uses: bytemare/actions/.github/workflows/scan-go.yml@main
     with:
       organization: bytemare-github
       project-key: bytemare_hash
