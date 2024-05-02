@@ -1,4 +1,4 @@
-name: Hash
+name: Code Scan
 #
 on:
   pull_request:
@@ -6,22 +6,11 @@ on:
       - main
 
 jobs:
-
   Lint:
     uses: bytemare/actions/.github/workflows/golangci-lint.yml@main
     with:
       config-path: ./.github/.golangci.yml
       scope: ./...
-
-  Test:
-    strategy:
-      fail-fast: false
-      matrix:
-        go: [ '1.22', '1.21' ]
-    uses: bytemare/actions/.github/workflows/test-go.yml@main
-    with:
-      command: cd .github && make test
-      version: ${{ matrix.go }}
 
   Analyze:
     uses: bytemare/actions/.github/workflows/scan-go.yml@main
