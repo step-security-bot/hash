@@ -15,14 +15,11 @@ jobs:
   Analyze:
     uses: bytemare/actions/.github/workflows/scan-go.yml@main
     with:
-      organization: bytemare-github
-      project-key: bytemare_hash
-      sources: .
-      exclusions: ""
-      tests: tests/
-      test-exclusions: examples_test.go,tests/**
-      coverage-exclusions: examples_test.go,tests/**
-      verbose: true
+      sonar-organization: bytemare-github
+      sonar-project-key: bytemare_hash
+      sonar-tests: tests/
+      sonar-test-exclusions: examples_test.go,tests/**
+      sonar-coverage-exclusions: examples_test.go,tests/**
     secrets:
       github: ${{ secrets.GITHUB_TOKEN }}
       sonar: ${{ secrets.SONAR_TOKEN }}
