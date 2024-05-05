@@ -20,6 +20,6 @@ jobs:
     strategy:
       fail-fast: false
 
-    uses: bytemare/actions/.github/workflows/codeql.yml@1e5a173454a4f4c4686fc9b07a2a34db9c0e963e
+    uses: bytemare/actions/.github/workflows/codeql.yml@7426e88e59255b27494452779f6937fe82bb56d9
     with:
       language: go

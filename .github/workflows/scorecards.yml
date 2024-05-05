@@ -18,6 +18,6 @@ jobs:
       security-events: write
       # Needed for GitHub OIDC token if publish_results is true
       id-token: write
-    uses: bytemare/actions/.github/workflows/scorecard.yml@1e5a173454a4f4c4686fc9b07a2a34db9c0e963e
+    uses: bytemare/actions/.github/workflows/scorecard.yml@7426e88e59255b27494452779f6937fe82bb56d9
     secrets:
       token: ${{ secrets.SCORECARD_TOKEN }}

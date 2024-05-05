@@ -13,13 +13,13 @@ on:
 
 jobs:
   Lint:
-    uses: bytemare/actions/.github/workflows/golangci-lint.yml@1e5a173454a4f4c4686fc9b07a2a34db9c0e963e
+    uses: bytemare/actions/.github/workflows/golangci-lint.yml@7426e88e59255b27494452779f6937fe82bb56d9
     with:
       config-path: ./.github/.golangci.yml
       scope: ./...
 
   Analyze:
-    uses: bytemare/actions/.github/workflows/scan-go.yml@1e5a173454a4f4c4686fc9b07a2a34db9c0e963e
+    uses: bytemare/actions/.github/workflows/scan-go.yml@7426e88e59255b27494452779f6937fe82bb56d9
     with:
       sonar-configuration: .github/sonar-project.properties
     secrets:
