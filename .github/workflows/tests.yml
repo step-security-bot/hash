@@ -2,9 +2,11 @@ name: Test
 
 on:
   pull_request:
-    branches: main
+    branches:
+      - main
   push:
-    branches: main
+    branches:
+      - main
 
 jobs:
   Test:
@@ -12,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         go: [ '1.22', '1.21' ]
-    uses: bytemare/actions/.github/workflows/test-go.yml@main
+    uses: bytemare/actions/.github/workflows/test-go.yml@5e46fe7caed6926b5ce48bf5c5d12a79aa074fd3
     with:
       command: cd .github && make test
       version: ${{ matrix.go }}

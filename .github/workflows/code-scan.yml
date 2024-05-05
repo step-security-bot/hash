@@ -7,13 +7,13 @@ on:
 
 jobs:
   Lint:
-    uses: bytemare/actions/.github/workflows/golangci-lint.yml@main
+    uses: bytemare/actions/.github/workflows/golangci-lint.yml@5e46fe7caed6926b5ce48bf5c5d12a79aa074fd3
     with:
       config-path: ./.github/.golangci.yml
       scope: ./...
 
   Analyze:
-    uses: bytemare/actions/.github/workflows/scan-go.yml@main
+    uses: bytemare/actions/.github/workflows/scan-go.yml@5e46fe7caed6926b5ce48bf5c5d12a79aa074fd3
     with:
       sonar-organization: bytemare-github
       sonar-project-key: bytemare_hash
